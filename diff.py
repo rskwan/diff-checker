@@ -2,12 +2,11 @@ from __future__ import with_statement
 import difflib
 import logging
 import os
-import sched
 import shutil
 import sqlite3
 from contextlib import closing
 from urllib import urlopen
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, session, g, url_for, abort, render_template
 from twilio.rest import TwilioRestClient
 from apscheduler.scheduler import Scheduler
 
@@ -79,17 +78,17 @@ def confirm_page():
     return render_template('confirm.html', phone=phone, url=url)
 
 def enter_data(phone, url):
-    contents = urlopen(url)
-    curpath = os.path.abspath(os.curdir)
-    last = url.split('/')[-1]
-    fname = "contents/%s-%s" % (phone, last)
-    with open(os.path.join(curpath, fname), 'w') as f:
-        shutil.copyfileobj(contents, f)
+    src = urlopen(url)
+    fname = generate_fname(phone, url)
+    with open(fname, 'w') as f:
+        shutil.copyfileobj(src, f)
     uid = get_id(phone)
     if uid is None:
-        query_db("insert into users (phone) values (?)", [phone])
+        g.db.execute("insert into users (phone) values (?)", [phone])
+        g.db.commit()
         uid = get_id(phone)
-    query_db("insert into requests (uid, url) values (?, ?)", [uid, url])
+    g.db.execute("insert into requests (uid, url) values (?, ?)", [uid, url])
+    g.db.commit()
     msg = "You will receive updates for %s! Love, Diff Checker." % url
     sched.add_interval_job(update, seconds=10, args=[uid])
     return send_text(phone, msg)
@@ -106,23 +105,27 @@ def update(uid):
 
 def check_and_send(phone, url):
     contents = urlopen(url).read()
-    curpath = os.path.abspath(os.curdir)
-    last = url.split('/')[-1]
-    fname = "contents/%s-%s" % (phone, last)
-    with open(os.path.join(curpath, fname), 'r') as f:
+    fname = generate_fname(phone, url)
+    with open(fname, 'r') as f:
         match = difflib.SequenceMatcher(None, f.read(), contents)
         matchratio = match.ratio()
         if matchratio != 1:
             print "Difference detected -- sending text to %s" % phone
             msg = "%s has changed! Love, Diff Checker." % url
             send_text(phone, msg)
-            with open(os.path.join(curpath, fname), 'w+') as f2:
+            with open(fname, 'w+') as f2:
                 f2.write(contents)
 
 def send_text(phone, content):
     msg = twilio_client.sms.messages.create(to=phone, from_=twilio_num,
                                             body=content)
     return msg
+
+def generate_fname(phone, url):
+    curpath = os.path.abspath(os.curdir)
+    last = url.split('/')[-1]
+    fname = "contents/%s-%s" % (phone, last)
+    return fname
 
 # adapted from flask docs
 def get_id(phone):

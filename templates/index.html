@@ -12,17 +12,26 @@
       </div>
       <div class="row">
         <div class="span8 offset2">
-	  <form action="/confirm" method="post">
-	    <div><label><h2>Website URL</h2></label>
-	      <input type="text" name="url" placeholder="http://www.coolsite.com"></input>
-	      <span class="help-block">Enter the URL for the website you want me to check!</span>
+	  <form class="form-horizontal" action="/confirm" method="post">
+	    <div class="control-group">
+	      <label class="control-label" for="url">Website URL</label>
+	      <div class="controls">
+		<input type="text" name="url" placeholder="http://www.coolsite.com"></input>
+		<span class="help-block">Enter the URL for the website you want me to check!</span>
+	      </div>
 	    </div>
-	    <div><label><h2>Phone Number</h2></label>
-	      <input type="text" name="phone" placeholder="+11234567890"></input>
-	      <span class="help-block">Enter your phone number! Don't forget your country code: +1 if you're from the USA, for example.</span>
+	    <div class="control-group">
+	      <label class="control-label" for="phone">Phone Number</label>
+	      <div class="controls">
+		<input type="text" name="phone" placeholder="+11234567890"></input>
+		<span class="help-block">Enter your phone number! Don't forget your country code: +1 if you're from the USA, for example.</span>
+	      </div>
 	    </div>
-	    <!--<textarea name="text" class="field span7" rows="15" placeholder="Type your message here."></textarea> <br>-->
-	    <button type="submit" class="btn btn-primary">Submit</button>
+	    <div class="control-group">
+	      <div class="controls">
+		<button type="submit" class="btn btn-primary">Submit</button>
+	      </div>
+	    </div>
 	  </form>
 	</div>
       </div>
