@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Diff Checker</title>
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <h1 class="page-name"><a href="/">Diff Checker</a></h1>
+      </div>
+      <div class="row">
+        <div class="span8 offset2">
+	  {% if url %}
+	  <p>The URL you want us to check is <b><a href="{{ url }}">{{ url }}</a></b>.</p>
+	  {% else %}
+	  <p>You didn't give us an URL. Why?</p>
+	  {% endif %}
+	  {% if phone %}
+	  <p>Your phone number is <b>{{ phone }}</b>. Thanks! We'll be sending you a text soon.</p>
+	  {% else %}
+	  <p>You didn't give us a phone number. Why?</p>
+	  {% endif %}
+	</div>
+      </div>
+    </div>
+  </body>
+</html>
